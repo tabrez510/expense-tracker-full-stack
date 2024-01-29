@@ -13,16 +13,20 @@
         <h1>Sign In</h1>
         <form>
             <div class="input-group">
+                <div id="signin-successful">
+                    <p>Sign In Successful</p>
+                </div>
                 <div class="input-field">
                     <i class="fa-solid fa-envelope"></i>
                     <label for="email"><input type="email" name="email" id="email" placeholder="Email" autocomplete="off"></label>
                 </div>
+                <p id="user-not-found" style="display: none; color: red; font-size: 12px;">User not found</p>
 
                 <div class="input-field">
                     <i class="fa-solid fa-lock"></i>
                     <label for="password"><input type="password" name="password" id="password" placeholder="Password" autocomplete="off"></label>
                 </div>
-                <p id="invalid-email-signup" style="display: none; color: red; font-size: 12px; margin-bottom: 5px;">Either email or password or both are wrong.</p>
+                <p id="incorrect-password" style="display: none; color: red; font-size: 12px; margin-bottom: 15px;">Incorrect password</p>
 
                 <p>Lost password <a href="#">Click Here</a></p>
             </div>

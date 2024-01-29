@@ -14,6 +14,24 @@
     position: relative;
 }
 
+#signup-successful {
+    display: none;
+    background-color: rgb(41, 175, 41);
+    height: 30px;
+    width: 100%;
+    border-radius: 2%;
+    position: relative;
+}
+
+#signup-successful p {
+    position: absolute;
+    top: 50%;
+    transform: translate(0%, -50%);
+    margin: auto 10px;
+    font-size: 13px;
+    color: #fff;
+}
+
 .form-box {
     width: 90%;
     max-width: 450px;
@@ -67,6 +85,19 @@ input {
 .input-field i {
    margin-left: 15px; 
    color: #999;
+}
+
+.invalid-display {
+    display: none;
+    color: red;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.invalid-input {
+    display: none;
+    color: red;
+    font-size: 12px;
 }
 
 form p {

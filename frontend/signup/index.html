@@ -13,27 +13,30 @@
         <h1>Sign Up</h1>
         <form>
             <div class="input-group">
+                <div id="signup-successful">
+                    <p>Sign Up Successful</p>
+                </div>
                 <div class="input-field">
                     <i class="fa-solid fa-user"></i>
                     <label for="name"><input type="text" name="name" id="name" placeholder="Name" autocomplete="off"></label>
                 </div>
-                <p id="invalid-name" style="display: none; color: red; font-size: 12px;">Enter valid Name</p>
+                <p id="invalid-name" class="invalid-input">Enter valid Name</p>
 
                 <div class="input-field">
                     <i class="fa-solid fa-envelope"></i>
                     <label for="email"><input type="email" name="email" id="email" placeholder="Email" autocomplete="off"></label>
                 </div>
-                <p id="invalid-email" style="display: none; color: red; font-size: 12px;">Email already exists. Choose a different email.</p>
+                <p id="invalid-email" class="invalid-input">Email already exists. Choose a different email.</p>
 
                 <div class="input-field">
                     <i class="fa-solid fa-lock"></i>
                     <label for="password"><input type="password" name="password" id="password" placeholder="Password" autocomplete="off"></label>
                 </div>
-                <p id="invalid-password-length" style="display: none; color: red; font-size: 11px; margin-bottom: 2px;">*Password length should be at least 8 characters</p>
-                <p id="invalid-password-upper" style="display: none; color: red; font-size: 11px; margin-bottom: 2px;">*Password should contain at least one uppercase letter</p>
-                <p id="invalid-password-lower" style="display: none; color: red; font-size: 11px; margin-bottom: 2px;">*Password should contain at least one lowercase letter</p>
-                <p id="invalid-password-numeric" style="display: none; color: red; font-size: 11px; margin-bottom: 2px;">*Password should contain at least one numeric digit</p>
-                <p id="invalid-password-special" style="display: none; color: red; font-size: 11px; margin-bottom: 2px;">*Password should contain at least one special character</p>
+                <p id="invalid-password-length" class="invalid-display">*Password length should be at least 8 characters</p>
+                <p id="invalid-password-upper" class="invalid-display">*Password should contain at least one uppercase letter</p>
+                <p id="invalid-password-lower" class="invalid-display">*Password should contain at least one lowercase letter</p>
+                <p id="invalid-password-numeric" class="invalid-display">*Password should contain at least one numeric digit</p>
+                <p id="invalid-password-special" class="invalid-display">*Password should contain at least one special character</p>
 
                 
             </div>
