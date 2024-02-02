@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Expense Tracker</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+      <link rel="stylesheet" href="styles.css">
+      
+  <body>
+    <div class="container">
+        <div class="form">
+            <section class="form-header">
+                <h1>Add Your Expense</h1>
+            </section>
+
+            <section class="form-section">
+                <form>
+                    <div class="input-group">
+                        <div class="input-field">
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                            <label for="amount"><input type="number" name="amount" id="amount" placeholder="Enter Amount" autocomplete="off"></label>
+                        </div>
+                        
+                        <div class="input-field">
+                            <label for="discription"><input type="text" name="discription" id="discription" placeholder="Enter Discription" autocomplete="off"></label>
+                        </div>
+
+                        <div class="input-field">
+                            <label for="catagory">
+                                <select name="catagory" id="catagory">
+                                    <option selected>Choose Catagory</option>
+                                    <option value="Electricity">Electricity</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Fuel">Fuel</option>
+                                    <option value="Movie">Movie</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+        
+                    <div class="btn-field">
+                        <button type="submit" id="addBtn">Add</button>
+                        <button type="button" id="editBtn" style="display: none;">Update</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+        <div class="table">
+            <section class="table-header">
+                <h1>Your Expenses</h1>
+            </section>
+
+            <section class="table-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Amount</th>
+                            <th>Discription</th>
+                            <th>Catagory</th>
+                            <th>Created At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.3/axios.min.js"></script>
+  <script src="index.js"></script>
+</html>

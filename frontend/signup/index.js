@@ -12,7 +12,25 @@ const invalidUpper = document.getElementById('invalid-password-upper');
 const invalidLower = document.getElementById('invalid-password-lower');
 const invalidNumeric = document.getElementById('invalid-password-numeric');
 const invalidSpecial = document.getElementById('invalid-password-special');
+const invalidName = document.getElementById('invalid-name');
 
+// input validation for name 
+const validateName = (name) => {
+    if(name == ''){
+        invalidName.innerHTML = 'Enter your name';
+        invalidName.style.display = 'block';
+        return false;
+    }
+
+    if(name.length <= 2){
+        invalidName.style.display = 'block';
+        return false;
+    }
+    else {
+        invalidName.style.display = 'none';
+        return true;
+    }
+}
 
 // input validation for password
 
@@ -75,6 +93,12 @@ passwordInput.addEventListener('input', (event) => {
 // input validation for email during signup
 const validateEmail = async(email) => {
     let flag = true;
+    if(email === ''){
+        invalidEmail.innerHTML = 'Enter email';
+        invalidEmail.style.display = 'block';
+        flag = false;
+        return;
+    }
     try{
         const res = await axios.post(`${baseURL}/user/signup/check-email`, {email});
 
@@ -102,7 +126,7 @@ form.addEventListener('submit', async(event) => {
     const name = event.target.name.value;
     const email = event.target.email.value;
     const password = event.target.password.value;
-    if(validateEmail(email) && validatePassword(password)){
+    if(validateName(name) && validateEmail(email) && validatePassword(password)){
         try {
             const user = await axios.post(`${baseURL}/user/signup`, {name, email, password});
 
