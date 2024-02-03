@@ -20,6 +20,10 @@ signinBtn.addEventListener('submit', async(event) => {
 
             document.getElementById('email').value = '';
             document.getElementById('password').value = '';
+
+            localStorage.setItem('token', isMatch.data.token);
+
+            window.location.href = '../expense/index.html';
         }
 
     } catch(err) {

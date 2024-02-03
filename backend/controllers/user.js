@@ -1,5 +1,10 @@
 const bcrypt = require('bcrypt');
-const User = require('../models/user')
+const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+
+function generatedWebToken (id) {
+    return jwt.sign({userId: id}, process.env.TOKEN_SECRET);
+}
 
 exports.createUser = async (req, res) => {
 
@@ -43,7 +48,7 @@ exports.checkPassword = async (req, res) => {
             const isMatch = await bcrypt.compare(password, hashedPasswordFromDatabase);
 
             if(isMatch){
-                return res.status(200).json({match: true, message: null});
+                return res.status(200).json({match: true, message: null, token: generatedWebToken(existingUser.id)});
             }
             else {
                 return res.status(401).json({match: false, message: 'Incorrect password'});

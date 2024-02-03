@@ -38,8 +38,9 @@ function formatCreatedAt(createdAtString) {
 }
 
 window.addEventListener('DOMContentLoaded', async() => {
+    const token = localStorage.getItem('token');
     try {
-        const res = await axios.get(`${baseURL}/expenses`);
+        const res = await axios.get(`${baseURL}/expenses`, {headers: {"Authorization": token}});
     
         for(let i=0; i<res.data.length; i++){
             showExpense(res.data[i]);
@@ -60,7 +61,8 @@ form.addEventListener('submit', async (event) => {
         const catagory = event.target.catagory.value;
 
         try {
-            const res = await axios.post(`${baseURL}/expenses`, {amount, discription, catagory});
+            const token = localStorage.getItem('token');
+            const res = await axios.post(`${baseURL}/expenses`, {amount, discription, catagory}, {headers: {"Authorization": token}});
             showExpense(res.data);
         } catch(err) {
             console.log(err);
@@ -135,7 +137,8 @@ async function editExpense (id, event) {
                 document.getElementById('addBtn').style.display = 'inline-block';
         
                 // update in database
-                await axios.put(`${baseURL}/expenses/${id}`, obj);
+                const token = localStorage.getItem('token');
+                await axios.put(`${baseURL}/expenses/${id}`, obj, {headers: {"Authorization": token}});
 
             } catch (err) {
                 console.log(err);
@@ -151,7 +154,8 @@ async function deleteExpense (id, event) {
         const tbody = document.querySelector('tbody');
         const tr = event.parentElement.parentElement;
         tbody.removeChild(tr);
-        await axios.delete(`${baseURL}/expenses/${id}`);
+        const token = localStorage.getItem('token');
+        await axios.delete(`${baseURL}/expenses/${id}`, {headers: {"Authorization": token}});
     } catch (err) {
         console.log(err);
         alert(err.message);
