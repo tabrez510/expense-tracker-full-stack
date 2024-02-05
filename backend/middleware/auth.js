@@ -7,12 +7,12 @@ exports.authenticate = async (req, res, next) => {
         if (!token) {
             return res.status(401).json({ success: false, message: 'Authorization token missing' });
         }
-        // console.log('token=====> ', token);
+        
         const decryptUser = jwt.verify(token, process.env.TOKEN_SECRET);
         const user = await User.findByPk(decryptUser.userId);
         if(user) {
             req.user = user;
-            // console.log('user =====>', req.user);
+            
             next();
         } else {
             return res.status(404).json({success: false, message: 'User Not Found'});

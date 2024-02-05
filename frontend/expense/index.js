@@ -40,14 +40,27 @@ function formatCreatedAt(createdAtString) {
 window.addEventListener('DOMContentLoaded', async() => {
     const token = localStorage.getItem('token');
     try {
+        const user = await axios.get(`${baseURL}/loggedin-user`, {headers: {"Authorization": token}});
+        
+        document.querySelector('span').textContent = user.data.name;
+        if(user.data.isPremiumUser){
+            document.querySelector('sup').style.display = 'inline-block';
+            document.querySelector('.btn-premium').style.display = 'none';
+        } else {
+            document.querySelector('sup').style.display = 'none';
+            document.querySelector('.btn-premium').style.display = 'block';
+        }
+
         const res = await axios.get(`${baseURL}/expenses`, {headers: {"Authorization": token}});
-    
         for(let i=0; i<res.data.length; i++){
             showExpense(res.data[i]);
         }
     } catch (err) {
         console.log(err);
-        alert(err.message);
+        if(err.response.status == 401){
+            window.location.href = '../login/index.html';
+            alert('Login again');
+        }
     }
 });
 
@@ -161,3 +174,33 @@ async function deleteExpense (id, event) {
         alert(err.message);
     }
 }
+
+document.getElementById('rzp-button1').addEventListener('click', async(e) => {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${baseURL}/premiummembership`, {headers: {"Authorization": token}});
+    console.log(response);
+
+    var options = {
+        "key": response.data.key_id,
+        "order_id": response.data.order.id,
+
+        "handler": async function (response) {
+            await axios.post(`${baseURL}/updatetransactionstatus`,{
+                order_id: options.order_id,
+                payment_id: response.razorpay_payment_id,
+            }, {headers: {"Authorization": token}});
+
+            alert('you are a premium user now');
+            location.reload();
+        }
+    };
+
+    const rzp1 = new Razorpay(options);
+    rzp1.open();
+    e.preventDefault();
+
+    rzp1.on('payment.failed', function (response) {
+        console.log(response);
+        alert('Something went wrong');
+    });
+});

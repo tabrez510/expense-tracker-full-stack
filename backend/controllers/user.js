@@ -58,3 +58,18 @@ exports.checkPassword = async (req, res) => {
         res.status(500).json({success: false, message: "Internal Server error"});
     }
 }
+
+exports.getUserDetails = async(req, res) => {
+    try {
+        const userDetails = await User.findByPk(req.user.id);
+        console.log(userDetails);
+        if(userDetails){
+            res.status(200).json({success: true, ...userDetails.dataValues});
+        } else {
+            res.status(404).json({success: false, message: 'Login Again'});
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({success: false, message: 'Internal Server Error'});
+    }
+}
