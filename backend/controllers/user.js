@@ -2,11 +2,11 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 
-function generatedWebToken (id) {
-    return jwt.sign({userId: id}, process.env.TOKEN_SECRET);
+function generatedWebToken (id, name, isPremiumUser) {
+    return jwt.sign({userId: id, name, isPremiumUser}, process.env.TOKEN_SECRET);
 }
 
-exports.createUser = async (req, res) => {
+const createUser = async (req, res) => {
 
     try {
         const {name, email, password} = req.body;
@@ -20,7 +20,7 @@ exports.createUser = async (req, res) => {
     }
 }
 
-exports.checkEmail = async (req, res) => {
+const checkEmail = async (req, res) => {
     const {email} = req.body;
 
     try {
@@ -35,7 +35,7 @@ exports.checkEmail = async (req, res) => {
     }
 }
 
-exports.checkPassword = async (req, res) => {
+const checkPassword = async (req, res) => {
     try {
         const {email, password} = req.body;
         const existingUser = await User.findOne({where : { email }});
@@ -48,7 +48,7 @@ exports.checkPassword = async (req, res) => {
             const isMatch = await bcrypt.compare(password, hashedPasswordFromDatabase);
 
             if(isMatch){
-                return res.status(200).json({match: true, message: null, token: generatedWebToken(existingUser.id)});
+                return res.status(200).json({match: true, message: null, token: generatedWebToken(existingUser.id, existingUser.name, existingUser.isPremiumUser)});
             }
             else {
                 return res.status(401).json({match: false, message: 'Incorrect password'});
@@ -59,12 +59,14 @@ exports.checkPassword = async (req, res) => {
     }
 }
 
-exports.getUserDetails = async(req, res) => {
+const getUserDetails = async(req, res) => {
     try {
         const userDetails = await User.findByPk(req.user.id);
-        console.log(userDetails);
+        const id = userDetails.id;
+        const name = userDetails.name;
+        const isPremiumUser = userDetails.isPremiumUser;
         if(userDetails){
-            res.status(200).json({success: true, ...userDetails.dataValues});
+            res.status(200).json({success: true, id, name, isPremiumUser});
         } else {
             res.status(404).json({success: false, message: 'Login Again'});
         }
@@ -72,4 +74,12 @@ exports.getUserDetails = async(req, res) => {
         console.log(err);
         res.status(500).json({success: false, message: 'Internal Server Error'});
     }
+}
+
+module.exports = {
+    generatedWebToken,
+    createUser,
+    checkEmail,
+    checkPassword,
+    getUserDetails
 }
