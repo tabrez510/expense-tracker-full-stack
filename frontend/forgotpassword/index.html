@@ -10,30 +10,32 @@
 <body>
 <div class="container">
     <div class="form-box">
-        <h1>Sign In</h1>
+        <h1>Forgot Password</h1>
         <form>
             <div class="input-group">
-                <div id="signin-successful">
-                    <p>Sign In Successful</p>
+                <!-- <div id="email-successful">
+                    <p>OTP Sent to your mail</p>
                 </div>
+                <div id="otp-successful">
+                    <p>Password Changed Successfully</p>
+                </div> -->
                 <div class="input-field">
                     <i class="fa-solid fa-envelope"></i>
-                    <label for="email"><input type="email" name="email" id="email" placeholder="Email" autocomplete="off"></label>
+                    <label for="email"><input type="email" name="email" id="email" placeholder="Enter Your Email" autocomplete="off"></label>
                 </div>
-                <p id="user-not-found" style="display: none; color: red; font-size: 12px;">User not found</p>
+                <!-- <p id="user-not-found" style="display: none; color: red; font-size: 12px;">User not found</p> -->
 
-                <div class="input-field">
+                <!-- <div class="input-field" style="display: none;">
                     <i class="fa-solid fa-lock"></i>
-                    <label for="password"><input type="password" name="password" id="password" placeholder="Password" autocomplete="off"></label>
+                    <label for="otp"><input type="text" name="otp" id="otp" placeholder="Enter Your OTP" autocomplete="off"></label>
                 </div>
-                <p id="incorrect-password" style="display: none; color: red; font-size: 12px; margin-bottom: 15px;">Incorrect password</p>
+                <p id="incorrect-otp" style="display: none; color: red; font-size: 12px; margin-bottom: 15px;">Incorrect OTP</p> -->
 
-                <p>Lost password <a href="../forgotpassword/index.html">Click Here</a></p>
             </div>
 
             <div class="btn-field">
-                <button type="button" id="signupBtn" class="disable" onclick="window.location.href='../signup/index.html'">Sign up</button>
-                <button type="submit" id="signinBtn">Sign in</button>
+                <!-- <button type="button" id="verifyBtn" style="display: none;">Verify</button> -->
+                <button type="submit" id="sendBtn">Send OTP</button>
             </div>
         </form>
     </div>
