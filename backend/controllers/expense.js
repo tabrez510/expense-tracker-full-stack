@@ -1,4 +1,5 @@
 const Expense = require('../models/expense');
+const User = require('../models/user');
 
 exports.createExpense = async (req, res) => {
 
@@ -6,6 +7,12 @@ exports.createExpense = async (req, res) => {
         const {amount, discription, catagory} = req.body;
 
         const expense = await Expense.create({amount, discription, catagory, userId: req.user.id});
+        const total_expense = Number(req.user.total_expense) + Number(amount);
+        await User.update({total_expense}, {
+            where: {
+                id: req.user.id
+            }
+        });
         res.json({success: true, ...expense.dataValues});
     } catch(err) {
         console.log(err);
@@ -43,17 +50,24 @@ exports.updateExpense = async (req, res) => {
     const { amount, description, category } = req.body;
 
     try {
-        const [updatedRows] = await Expense.update(
+        const [rowCount, updatedRows] = await Expense.update(
             { amount, description, category },
             {
                 where: {
                     id: expenseId,
                     userId: req.user.id,
                 },
+                returning: true
             }
         );
 
-        if (updatedRows > 0) {
+        if (rowCount > 0) {
+            const total_expense = Number(req.user.total_expense) - Number(updatedRows[0].amount) + Number(amount);
+            await User.update({total_expense}, {
+                where: {
+                    id: req.user.id
+                }
+            });
             res.json({ success: true, ...{ id: expenseId, amount, description, category } });
         } else {
             res.status(404).json({ success: false, message: 'Expense Not Found' });
@@ -77,7 +91,12 @@ exports.deleteExpense = async (req, res) => {
         });
 
         if (deletedRows > 0) {
-            
+            const total_expense = Number(req.user.total_expense) - Number(expenseById.amount);
+            await User.update({total_expense}, {
+                where: {
+                    id: req.user.id
+                }
+            });
             res.json({ success: true, ...expenseById.dataValues });
         } else {
             res.status(404).json({ success: false, message: 'Expense Not Found' });

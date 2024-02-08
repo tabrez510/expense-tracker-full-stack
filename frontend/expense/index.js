@@ -103,7 +103,7 @@ window.addEventListener('DOMContentLoaded', async() => {
         }
     } catch(err) {
         console.log(err);
-        if(err.response.status == 401){
+        if(err.response.status == 401 || err.response.status == 404){
             window.location.href = '../login/index.html';
             alert('Login again');
         }
