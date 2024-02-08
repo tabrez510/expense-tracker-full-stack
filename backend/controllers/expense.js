@@ -1,13 +1,12 @@
-const { Transaction } = require('sequelize');
 const Expense = require('../models/expense');
 const User = require('../models/user');
 const sequelize = require('../utils/database');
 
 exports.createExpense = async (req, res) => {
+    const t = await sequelize.transaction();
 
     try{
         const {amount, discription, catagory} = req.body;
-        const t = await sequelize.transaction();
         const expense = await Expense.create({amount, discription, catagory, userId: req.user.id}, {transaction: t});
         const total_expense = Number(req.user.total_expense) + Number(amount);
         await User.update({total_expense}, {
@@ -53,9 +52,9 @@ exports.getExpenses = async (req, res) => {
 exports.updateExpense = async (req, res) => {
     const expenseId = req.params.id;
     const { amount, description, category } = req.body;
+    const t = await sequelize.transaction();
 
-    try {
-        const t = await sequelize.transaction();
+    try {    
         const [rowCount, updatedRows] = await Expense.update(
             { amount, description, category },
             {
@@ -91,9 +90,9 @@ exports.updateExpense = async (req, res) => {
 
 exports.deleteExpense = async (req, res) => {
     const expenseId = req.params.id;
+    const t = await sequelize.transaction();
 
     try {
-        const t = await sequelize.transaction();
         const expenseById = await Expense.findOne({ where: { id: expenseId, userId: req.user.id }});
         const deletedRows = await Expense.destroy({
             where: {
