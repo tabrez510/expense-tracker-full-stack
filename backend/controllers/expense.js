@@ -1,20 +1,25 @@
+const { Transaction } = require('sequelize');
 const Expense = require('../models/expense');
 const User = require('../models/user');
+const sequelize = require('../utils/database');
 
 exports.createExpense = async (req, res) => {
 
     try{
         const {amount, discription, catagory} = req.body;
-
-        const expense = await Expense.create({amount, discription, catagory, userId: req.user.id});
+        const t = await sequelize.transaction();
+        const expense = await Expense.create({amount, discription, catagory, userId: req.user.id}, {transaction: t});
         const total_expense = Number(req.user.total_expense) + Number(amount);
         await User.update({total_expense}, {
             where: {
                 id: req.user.id
-            }
+            },
+            transaction: t
         });
+        await t.commit();
         res.json({success: true, ...expense.dataValues});
     } catch(err) {
+        await t.rollback();
         console.log(err);
         res.status(500).json({success: false, message: 'Internal Srver Error'});
     }
@@ -50,6 +55,7 @@ exports.updateExpense = async (req, res) => {
     const { amount, description, category } = req.body;
 
     try {
+        const t = await sequelize.transaction();
         const [rowCount, updatedRows] = await Expense.update(
             { amount, description, category },
             {
@@ -57,7 +63,8 @@ exports.updateExpense = async (req, res) => {
                     id: expenseId,
                     userId: req.user.id,
                 },
-                returning: true
+                returning: true,
+                transaction: t
             }
         );
 
@@ -66,13 +73,17 @@ exports.updateExpense = async (req, res) => {
             await User.update({total_expense}, {
                 where: {
                     id: req.user.id
-                }
+                },
+                transaction: t
             });
+            await t.commit();
             res.json({ success: true, ...{ id: expenseId, amount, description, category } });
         } else {
+            await t.rollback();
             res.status(404).json({ success: false, message: 'Expense Not Found' });
         }
     } catch (err) {
+        await rollback();
         console.log(err);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
@@ -82,26 +93,32 @@ exports.deleteExpense = async (req, res) => {
     const expenseId = req.params.id;
 
     try {
-        const expenseById = await Expense.findOne({ where: { id: expenseId, userId: req.user.id } });
+        const t = await sequelize.transaction();
+        const expenseById = await Expense.findOne({ where: { id: expenseId, userId: req.user.id }});
         const deletedRows = await Expense.destroy({
             where: {
                 id: expenseId,
                 userId: req.user.id,
             },
+            transaction: t
         });
 
         if (deletedRows > 0) {
             const total_expense = Number(req.user.total_expense) - Number(expenseById.amount);
             await User.update({total_expense}, {
                 where: {
-                    id: req.user.id
-                }
+                    id: req.user.id,
+                },
+                transaction: t
             });
+            await t.commit();
             res.json({ success: true, ...expenseById.dataValues });
         } else {
+            await t.rollback();
             res.status(404).json({ success: false, message: 'Expense Not Found' });
         }
     } catch (err) {
+        await t.rollback();
         console.log(err);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
