@@ -225,21 +225,11 @@ input {
     outline: 0;
     cursor: pointer;
 }
-.edit {
+
+.delete, .edit, .sortby {
     background: #3c00a0;
     color: #fff;
-    width: 2.8rem;
-    height: 2.2rem;
-    border-radius: 0.3rem;
-    border: 0;
-    outline: 0;
-    cursor: pointer;
-}
-.delete {
-    background: #3c00a0;
-    color: #fff;
-    width: 3rem;
-    height: 2.2rem;
+    padding: 0.55rem 1rem;
     border-radius: 0.3rem;
     border: 0;
     outline: 0;
@@ -248,6 +238,25 @@ input {
 .delete{
     background: red;  
 }
+.sortby{
+    margin-left: 2rem;
+}
+#download-report{
+    color: #fff;
+    background: #3c00a0;
+    padding: 0.55rem 1rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    margin-left: 2rem;
+}
+
+.table-header .active {
+    background: #fff;
+    color: black;
+    border: #3c00a0 1px solid;
+}
+
+
 
 select {
     background: transparent;
@@ -276,6 +285,8 @@ div.table {
     height: 10%;
     background-color: #fff4;
     padding: .8rem 1rem;
+    display: flex;
+    align-items: center;
 }
 
 .table-body{
