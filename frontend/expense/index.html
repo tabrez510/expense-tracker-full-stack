@@ -20,6 +20,9 @@
                 <div class="btn-leader" style="display: none;">
                     <button id="leaderboard">Show Leaderbaord</button>
                 </div>
+                <div class="btn-leader">
+                    <button id="logout" style="background-color: red; color: #fff;">Logout</button>
+                </div>
             </div>
             <div class="table-leader" style="display: none;">
                 <section class="table-leader-header">
@@ -57,13 +60,13 @@
                         </div>
                         
                         <div class="input-field">
-                            <label for="discription"><input type="text" name="discription" id="discription" placeholder="Enter Discription" autocomplete="off"></label>
+                            <label for="description"><input type="text" name="description" id="description" placeholder="Enter Description" autocomplete="off"></label>
                         </div>
 
                         <div class="input-field">
-                            <label for="catagory">
-                                <select name="catagory" id="catagory">
-                                    <option selected>Choose Catagory</option>
+                            <label for="category">
+                                <select name="category" id="category">
+                                    <option selected>Choose Category</option>
                                     <option value="Electricity">Electricity</option>
                                     <option value="Food">Food</option>
                                     <option value="Fuel">Fuel</option>
@@ -80,14 +83,29 @@
                 </form>
             </section>
         </div>
+
+        <div class="download-report" style="display: none;">
+            <button type="button" id="prev-downloads" class="download-btn">Previous Downloads</button>
+            <button type="button" id="download-report" class="download-btn">Download Expenses</button>
+            <div class="download-report-list">
+                
+            </div>
+        </div>
         <div class="table">
             <section class="table-header">
                 <h1>Your Expenses</h1>
-                <button type="button" id="daily" class="sortby">Daily</button>
-                <button type="button" id="weekly" class="sortby">Weekly</button>
-                <button type="button" id="monthly" class="sortby">Monthly</button>
-                <button type="button" id="yearly" class="sortby">Yearly</button>
-                <i class="fa-solid fa-download" id="download-report" title="Download Report"></i>
+                <div class="items-per-page-container">
+                    <label for="items-per-page">
+                        <select name="items-per-page" id="items-per-page">
+                            <option selected>Choose Items Per Page</option>
+                            <option value="1">1</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                        </select>
+                    </label>
+                </div>
             </section>
 
             <section class="table-body">
@@ -95,7 +113,7 @@
                     <thead>
                         <tr>
                             <th>Amount</th>
-                            <th>Discription</th>
+                            <th>Description</th>
                             <th>Catagory</th>
                             <th>Created At</th>
                             <th>Action</th>
@@ -108,6 +126,10 @@
                 </table>
             </section>
         </div>
+
+        <section class="pagination">
+            
+        </section>
     </div>
   </body>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>

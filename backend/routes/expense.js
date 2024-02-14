@@ -10,4 +10,5 @@ router.post('/expenses', userAuthentication.authenticate, expenseController.crea
 router.put('/expenses/:id', userAuthentication.authenticate, expenseController.updateExpense);
 router.delete('/expenses/:id', userAuthentication.authenticate, expenseController.deleteExpense);
 
+
 module.exports = router;

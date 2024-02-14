@@ -6,8 +6,8 @@ exports.createExpense = async (req, res) => {
     const t = await sequelize.transaction();
 
     try{
-        const {amount, discription, catagory} = req.body;
-        const expense = await Expense.create({amount, discription, catagory, userId: req.user.id}, {transaction: t});
+        const {amount, description, category} = req.body;
+        const expense = await Expense.create({amount, description, category, userId: req.user.id}, {transaction: t});
         const total_expense = Number(req.user.total_expense) + Number(amount);
         await User.update({total_expense}, {
             where: {
@@ -41,8 +41,30 @@ exports.getExpenseById = async (req, res) => {
 
 exports.getExpenses = async (req, res) => {
     try {
-        const expenses = await Expense.findAll({ where: { userId: req.user.id}});
-        res.json([...expenses.map((expense) => expense.dataValues)]);
+        const page = +req.query.page || 1;
+        const items_per_page = +req.query.items_per_page || 5;
+        let totalItems = await Expense.count({
+            where: {
+                userId: req.user.id
+            }
+        });
+        const expenses = await Expense.findAll({ 
+            where: { 
+                userId: req.user.id
+            },
+            order: [['createdAt', 'DESC']],
+            offset: (page-1)*items_per_page,
+            limit: items_per_page
+        });
+        res.json({
+            expenses: expenses,
+            currentPage: page,
+            hasNextPage: items_per_page * page < totalItems,
+            nextPage: page + 1,
+            hasPreviousPage: page > 1,
+            previousPage: page - 1,
+            lastPage: Math.ceil(totalItems/items_per_page)
+        });
     } catch(err) {
         console.log(err);
         res.json({success: false, message: 'Internal Server Error'});
@@ -50,25 +72,30 @@ exports.getExpenses = async (req, res) => {
 }
 
 exports.updateExpense = async (req, res) => {
-    const expenseId = req.params.id;
+    const expenseId = Number(req.params.id);
     const { amount, description, category } = req.body;
     const t = await sequelize.transaction();
 
-    try {    
-        const [rowCount, updatedRows] = await Expense.update(
+    try {
+        const {dataValues: {amount: oldAmount}} = await Expense.findOne({
+            where: {
+                id: expenseId,
+                userId: req.user.id
+            }
+        })    
+        const [rowCount] = await Expense.update(
             { amount, description, category },
             {
                 where: {
                     id: expenseId,
                     userId: req.user.id,
                 },
-                returning: true,
                 transaction: t
             }
         );
 
         if (rowCount > 0) {
-            const total_expense = Number(req.user.total_expense) - Number(updatedRows[0].amount) + Number(amount);
+            const total_expense = Number(req.user.total_expense) - Number(oldAmount) + Number(amount);
             await User.update({total_expense}, {
                 where: {
                     id: req.user.id
@@ -82,7 +109,7 @@ exports.updateExpense = async (req, res) => {
             res.status(404).json({ success: false, message: 'Expense Not Found' });
         }
     } catch (err) {
-        await rollback();
+        await t.rollback();
         console.log(err);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
@@ -122,3 +149,4 @@ exports.deleteExpense = async (req, res) => {
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 };
+

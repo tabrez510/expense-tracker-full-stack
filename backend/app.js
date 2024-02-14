@@ -1,6 +1,11 @@
 const express = require('express');
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
+const path = require('path');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3000;
@@ -15,10 +20,19 @@ const user = require('./models/user');
 const expense = require('./models/expense');
 const order = require('./models/orders');
 const forgotpassword = require('./models/forgotpassword');
+const reportURL = require('./models/reportURL');
+
+const accessLogStream = fs.createWriteStream(
+    path.join(__dirname, 'access.log'),
+    {flags: 'a'}
+);
 
 const app = express();
 
 app.use(cors());
+app.use(helmet());
+app.use(compression());
+app.use(morgan('combined', {stream: accessLogStream}));
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -37,6 +51,9 @@ order.belongsTo(user);
 
 user.hasMany(forgotpassword);
 forgotpassword.belongsTo(user);
+
+user.hasMany(reportURL);
+reportURL.belongsTo(user);
 
 sequelize
     .sync({force: false})

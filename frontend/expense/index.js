@@ -2,19 +2,19 @@ const baseURL = 'http://localhost:3000/api';
 
 function validate () {
     const amount = document.getElementById('amount').value;
-    const discription = document.getElementById('discription').value;
-    const catagory = document.getElementById('catagory').value;
+    const description = document.getElementById('description').value;
+    const category = document.getElementById('category').value;
 
     if(!amount && amount !== 0){
         alert('Enter Your Amount');
         return false;
     }
-    if(!discription){
-        alert('Enter Your Discription');
+    if(!description){
+        alert('Enter Your Description');
         return false;
     }
-    if(catagory == 'Choose Catagory'){
-        alert('Choose Your Catagory');
+    if(category == 'Choose Category'){
+        alert('Choose Your Category');
         return false;
     }
     return true;
@@ -80,33 +80,118 @@ async function showLeader() {
     }
 }
 
-window.addEventListener('DOMContentLoaded', async() => {
 
-    const token = localStorage.getItem('token');
-    const decodedToken = parseJwt(token);
-    document.querySelector('span').textContent = decodedToken.name;
-    if(decodedToken.isPremiumUser){
-        document.querySelector('.btn-leader').style.display = 'block';
-        document.querySelector('.table-leader').style.display = 'block';
-        document.querySelector('sup').style.display = 'inline-block';
-        document.querySelector('.btn-premium').style.display = 'none';
-        document.getElementById('leaderboard').onclick = showLeader;
-    } else {
-        document.querySelector('sup').style.display = 'none';
-        document.querySelector('.btn-premium').style.display = 'block';
+function renderPaginationButtons(totalPages, currentPage) {
+    const paginationSection = document.querySelector('.pagination');
+
+    paginationSection.innerHTML = '';
+
+    if(currentPage > 1){
+        paginationSection.innerHTML += `<button class="page-number" onclick="navigateToPage(${Math.max(currentPage - 1, 1)})">Previous</button>`;
+    }
+    const MAX_PAGES_DISPLAYED = 10;
+    const halfMaxPages = Math.floor(MAX_PAGES_DISPLAYED / 2);
+    let startPage = Math.max(currentPage - halfMaxPages, 1);
+    let endPage = Math.min(startPage + MAX_PAGES_DISPLAYED - 1, totalPages);
+    if (endPage - startPage < MAX_PAGES_DISPLAYED - 1) {
+        startPage = Math.max(endPage - MAX_PAGES_DISPLAYED + 1, 1);
+    }
+    if(startPage > 2){
+        paginationSection.innerHTML += `<button class="page-number" onclick="navigateToPage(${1})">${1}</button>`;
+        paginationSection.innerHTML += `<span>...</span>`
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        paginationSection.innerHTML += `<button class="page-number ${currentPage === i ? 'active' : ''}" onclick="navigateToPage(${i})">${i}</button>`;
     }
 
-    try{
-        const expenses = await axios.get(`${baseURL}/user/expenses`, {headers: {"Authorization": token}}); 
-        for(let i=0; i<expenses.data.length; i++){
-            showExpense(expenses.data[i]);
+    if(endPage < totalPages - 1){
+        paginationSection.innerHTML += `<span>...</span>`
+        paginationSection.innerHTML += `<button class="page-number" onclick="navigateToPage(${totalPages})">${totalPages}</button>`;
+    }
+
+    if(currentPage < totalPages){
+        paginationSection.innerHTML += `<button class="page-number" onclick="navigateToPage(${Math.min(currentPage + 1, totalPages)})">Next</button>`;
+    }
+}
+
+
+async function navigateToPage(pageNumber) {
+    try {
+        const token = localStorage.getItem('token');
+        const itemsPerPage = localStorage.getItem('items-per-page') || 5;
+        const response = await axios.get(`${baseURL}/user/expenses?page=${pageNumber}&items_per_page=${itemsPerPage}`, {
+            headers: { "Authorization": token }
+        });
+
+        showExpense(response.data.expenses);
+
+        renderPaginationButtons(response.data.lastPage, pageNumber);
+    } catch (err) {
+        console.log(err);
+        if (err.response.status === 401 || err.response.status === 404) {
+            window.location.href = '../login/index.html';
+            alert('Login again');
         }
+    }
+}
+
+document.getElementById('items-per-page').addEventListener('change', async() => {
+    try {
+        const token = localStorage.getItem('token');
+        const val = document.getElementById('items-per-page').value;
+        localStorage.setItem('items-per-page', val);
+        const expenses = await axios.get(`${baseURL}/user/expenses?page=1&items_per_page=${val}`, {headers: {"Authorization": token}});
+        showExpense(expenses.data.expenses);
+        renderPaginationButtons(expenses.data.lastPage, expenses.data.currentPage);
     } catch(err) {
         console.log(err);
         if(err.response.status == 401 || err.response.status == 404){
             window.location.href = '../login/index.html';
             alert('Login again');
+        } 
+    }
+})
+
+document.getElementById('logout').addEventListener('click', () => {
+    if(localStorage.getItem('token')){
+        localStorage.removeItem('token');
+    }
+    window.location.href = "../index.html";
+})
+
+window.addEventListener('DOMContentLoaded', async() => {
+    
+    try{
+        if(!localStorage.getItem('token')){
+            window.location.href = '../login/index.html';
+            alert('Login again');
         }
+        const token = localStorage.getItem('token');
+        const decodedToken = parseJwt(token);
+        document.querySelector('span').textContent = decodedToken.name;
+        if(decodedToken.isPremiumUser){
+            document.querySelector('.btn-leader').style.display = 'block';
+            document.querySelector('.table-leader').style.display = 'block';
+            document.querySelector('sup').style.display = 'inline-block';
+            document.querySelector('.btn-premium').style.display = 'none';
+            document.getElementById('leaderboard').onclick = showLeader;
+            document.querySelector('.download-report').style.display = 'block';
+        } else {
+            document.querySelector('sup').style.display = 'none';
+            document.querySelector('.btn-premium').style.display = 'block';
+        }
+        var items_per_page;
+        if(localStorage.getItem('items-per-page')){
+            items_per_page = localStorage.getItem('items-per-page');
+        } else {
+            items_per_page = '5';
+        }
+        const expenses = await axios.get(`${baseURL}/user/expenses?page=1&items_per_page=${items_per_page}`, {headers: {"Authorization": token}});
+        showExpense(expenses.data.expenses);
+        renderPaginationButtons(expenses.data.lastPage, expenses.data.currentPage);
+    } catch(err) {
+        console.log(err);
     }
 });
 
@@ -116,13 +201,21 @@ form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         const amount = event.target.amount.value;
-        const discription = event.target.discription.value;
-        const catagory = event.target.catagory.value;
+        const description = event.target.description.value;
+        const category = event.target.category.value;
 
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.post(`${baseURL}/user/expenses`, {amount, discription, catagory}, {headers: {"Authorization": token}});
-            showExpense(res.data);
+            const res = await axios.post(`${baseURL}/user/expenses`, {amount, description, category}, {headers: {"Authorization": token}});
+            var items_per_page;
+            if(localStorage.getItem('items-per-page')){
+                items_per_page = localStorage.getItem('items-per-page');
+            } else {
+                items_per_page = '5';
+            }
+            const expenses = await axios.get(`${baseURL}/user/expenses?page=1&items_per_page=${items_per_page}`, {headers: {"Authorization": token}}); 
+            showExpense(expenses.data.expenses);
+            renderPaginationButtons(expenses.data.lastPage, expenses.data.currentPage);
         } catch(err) {
             console.log(err);
             alert(err.message);
@@ -130,80 +223,92 @@ form.addEventListener('submit', async (event) => {
     }
 });
 
-function showExpense(expense){
+function showExpense(expenses){
     const tbody = document.querySelectorAll('tbody');
-    const formattedCreatedAt = formatCreatedAt(expense.createdAt);
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-        <td>${expense.amount}</td>
-        <td>${expense.discription}</td>
-        <td>${expense.catagory}</td>
-        <td>${formattedCreatedAt}</td>
-        <td>
-            <button class="edit" onclick="editExpense(${expense.id}, this)">Edit</button>
-            <button class="delete" onclick="deleteExpense(${expense.id}, this)">Delete</button>
-        </td>
-    `;
-
-
-    tbody[1].insertBefore(tr, tbody.firstChild);
+    tbody[1].innerHTML = '';
+    
+    expenses.forEach((expense) => {
+        const formattedCreatedAt = formatCreatedAt(expense.createdAt);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${expense.amount}</td>
+            <td>${expense.description}</td>
+            <td>${expense.category}</td>
+            <td>${formattedCreatedAt}</td>
+            <td>
+                <button class="edit" onclick="editExpense(${expense.id})">Edit</button>
+                <button class="delete" onclick="deleteExpense(${expense.id}, this)">Delete</button>
+            </td>
+        `;
+        tbody[1].appendChild(tr);
+    })
 
     document.getElementById('amount').value = '';
-    document.getElementById('discription').value = '';
-    document.getElementById('catagory').value = 'Choose Catagory';
+    document.getElementById('description').value = '';
+    document.getElementById('category').value = 'Choose Category';
 }
 
-function editExpense (id, event) {
-    const catagory = event.parentElement.previousElementSibling.previousElementSibling.textContent;
-    const discription = event.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.textContent;
-    const amount = event.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.textContent;
+async function editExpense (id) {
 
-    
-    
     // populate these values in the input fields
-    document.getElementById('amount').value = amount;
-    document.getElementById('discription').value = discription;
-    document.getElementById('catagory').value = catagory;
+    try {
+        const token = localStorage.getItem('token');
+        const {data:{amount: amountVal, description: descriptionVal, category: categoryVal }} = await axios.get(`${baseURL}/user/expenses/${id}`, {headers: {"Authorization": token}});
+        document.getElementById('amount').value = amountVal;
+        document.getElementById('description').value = descriptionVal;
+        document.getElementById('category').value = categoryVal;
+        document.getElementById('addBtn').style.display = 'none';
+        document.getElementById('editBtn').style.display = 'inline-block';
+    } catch(err){
+        console.log(err);
+        alert(err.message);
+    }
 
-    document.getElementById('addBtn').style.display = 'none';
-    document.getElementById('editBtn').style.display = 'inline-block';
 
     const editBtn = document.getElementById('editBtn');
 
-    editBtn.addEventListener('click', async() => {
-        const inputAmount = document.getElementById('amount').value;
-        const inputDiscription = document.getElementById('discription').value;
-        const inputCatagory = document.getElementById('catagory').value;
 
-        const obj = {
-            amount : inputAmount,
-            discription : inputDiscription,
-            catagory : inputCatagory
-        }
+    // Add a new event listener
+    editBtn.addEventListener('click', editBtnClickHandler);
+
+    async function editBtnClickHandler() {
         try {
-            // update in the dom through event object
-            event.parentElement.previousElementSibling.previousElementSibling.textContent = inputCatagory;
-            event.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.textContent = inputDiscription;
-            event.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.textContent = inputAmount;
-
+            const inputAmount = document.getElementById('amount').value;
+            const inputDescription = document.getElementById('description').value;
+            const inputCategory = document.getElementById('category').value;
+    
+            const obj = {
+                amount : inputAmount,
+                description : inputDescription,
+                category : inputCategory
+            }
+            
             document.getElementById('amount').value = '';
-            document.getElementById('discription').value = '';
-            document.getElementById('catagory').value = 'Choose Catagory';
-
+            document.getElementById('description').value = '';
+            document.getElementById('category').value = 'Choose Category';
             document.getElementById('editBtn').style.display = 'none';
             document.getElementById('addBtn').style.display = 'inline-block';
     
             // update in database
-            const token = localStorage.getItem('token');
+            let token = localStorage.getItem('token');
             await axios.put(`${baseURL}/user/expenses/${id}`, obj, {headers: {"Authorization": token}});
-
+            var items_per_page;
+            if(localStorage.getItem('items-per-page')){
+                items_per_page = localStorage.getItem('items-per-page');
+            } else {
+                items_per_page = '5';
+            }
+            const expenses = await axios.get(`${baseURL}/user/expenses?page=1&items_per_page=${items_per_page}`, {headers: {"Authorization": token}}); 
+            showExpense(expenses.data.expenses);
+            renderPaginationButtons(expenses.data.lastPage, expenses.data.currentPage);
+            // Remove previous event listener if it exists
+            editBtn.removeEventListener('click', editBtnClickHandler);
+            
         } catch (err) {
             console.log(err);
             alert(err.message);
         }
-
-    })
+    }
 }
 
 async function deleteExpense (id, event) {
@@ -213,11 +318,69 @@ async function deleteExpense (id, event) {
         tbody[1].removeChild(tr);
         const token = localStorage.getItem('token');
         await axios.delete(`${baseURL}/user/expenses/${id}`, {headers: {"Authorization": token}});
+        var items_per_page;
+        if(localStorage.getItem('items-per-page')){
+            items_per_page = localStorage.getItem('items-per-page');
+        } else {
+            items_per_page = '5';
+        }
+        const expenses = await axios.get(`${baseURL}/user/expenses?page=1&items_per_page=${items_per_page}`, {headers: {"Authorization": token}}); 
+        showExpense(expenses.data.expenses);
+        renderPaginationButtons(expenses.data.lastPage, expenses.data.currentPage);
     } catch (err) {
         console.log(err);
         alert(err.message);
     }
 }
+
+document.getElementById('download-report').addEventListener('click', async() => {
+    try {
+        const token = localStorage.getItem('token');
+        const expense = await axios.get(`${baseURL}/premium/download`, {headers: {"Authorization": token}});
+    
+        const fileLink = expense.data.fileURL; 
+        console.log(fileLink);
+            
+        const link = document.createElement('a');
+        link.href = fileLink;
+        link.target = '_blank'; 
+        link.download = ''; 
+    
+        link.click();
+    } catch(err) {
+        console.log(err);
+        alert(err.message);
+    }
+})
+
+document.getElementById('prev-downloads').addEventListener('click', async() => {
+    try{
+        const divList = document.querySelector('.download-report-list');
+        if(divList.style.display == 'block'){
+            divList.style.display = 'none';
+            return;
+        }
+        const token = localStorage.getItem('token');
+        const urls = await axios.get(`${baseURL}/premium/getreport`, {headers: {"Authorization": token}});
+        divList.innerHTML = '';
+
+        if(urls.data.length==0){
+            divList.innerHTML = '<p>File Not Found</p>';
+            divList.style.display = 'block';
+            return;
+        }
+
+        urls.data.forEach((element, index) => {
+            divList.innerHTML += `<p>File ${index+1}: <span>
+                    <a href="${element.Url}" target="_blank">${formatCreatedAt(element.createdAt)}</a>
+                    </span></p>`
+        });
+        divList.style.display = 'block';
+    } catch(err) {
+        console.log(err);
+        alert(err.message);
+    }
+})
 
 document.getElementById('rzp-button1').addEventListener('click', async(e) => {
     try {
@@ -246,6 +409,7 @@ document.getElementById('rzp-button1').addEventListener('click', async(e) => {
                     document.querySelector('.table-leader').style.display = 'block';
 
                     document.querySelector('.btn-leader').onclick = showLeader;
+                    document.querySelector('.download-report').style.display = 'block';
                 } catch(err) {
                     console.error(err);
                     alert('Failed to update transaction status.');
