@@ -1,4 +1,4 @@
-const baseURL = 'http://3.25.214.158/:3000/api';
+const baseURL = 'http://3.25.214.158/api';
 const signupBtn = document.getElementById('signupBtn');
 const form = document.querySelector('form');
 

@@ -9,7 +9,7 @@ form.addEventListener('submit', async (e) => {
     }
 
     try{
-        const response =await axios.post('http://3.25.214.158/:3000/api/password/forgotpassword', userDetails);
+        const response =await axios.post('http://3.25.214.158/api/password/forgotpassword', userDetails);
         if(response.status == 202){
             alert('password changed');
         }
