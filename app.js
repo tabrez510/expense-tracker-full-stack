@@ -2,8 +2,6 @@ const express = require('express');
 const fs = require('fs');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const helmet = require('helmet');
-const compression = require('compression');
 const morgan = require('morgan');
 const path = require('path');
 require('dotenv').config();
@@ -30,8 +28,7 @@ const accessLogStream = fs.createWriteStream(
 const app = express();
 
 app.use(cors());
-app.use(helmet());
-app.use(compression());
+
 app.use(morgan('combined', {stream: accessLogStream}));
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -42,6 +39,10 @@ app.use('/api/user', expenseRoutes);
 app.use('/api/user', purchaseRoutes);
 app.use('/api/premium', premiumFeaturesRoutes);
 app.use('/api/password', passwordRoutes);
+
+app.use((req, res) => {
+    res.sendFile(path.join(__dirname, `public/${req.url}`))
+})
  
 user.hasMany(expense);
 expense.belongsTo(user);
