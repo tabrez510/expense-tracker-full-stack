@@ -1,4 +1,4 @@
-const baseURL = 'http://52.64.174.227:3000/api';
+const baseURL = 'http://http://3.25.214.158/:3000/api';
 
 const signinBtn = document.querySelector('form');
 
