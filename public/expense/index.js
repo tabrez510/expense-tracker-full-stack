@@ -1,4 +1,4 @@
-const baseURL = 'http://3.25.214.158/api';
+const baseURL = 'http://13.239.43.152/api';
 
 function validate () {
     const amount = document.getElementById('amount').value;
