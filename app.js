@@ -25,6 +25,8 @@ const accessLogStream = fs.createWriteStream(
     {flags: 'a'}
 );
 
+console.log('webhooks is working');
+
 const app = express();
 
 app.use(cors());
