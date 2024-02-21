@@ -24,7 +24,7 @@ const forgotpassword = async (req, res) => {
             let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); 
             sendSmtpEmail.subject = "Forgot Password";
             sendSmtpEmail.textContent = "Visit this link to reset your password";
-            sendSmtpEmail.htmlContent = `<a href="http://13.239.43.1520/api/password/resetpassword/${id}">Reset password</a>`,
+            sendSmtpEmail.htmlContent = `<a href="http://13.239.43.152/api/password/resetpassword/${id}">Reset password</a>`,
             sendSmtpEmail.sender = {"name": "Md Tabrez Alam", "email": "alamtabrez510@gmail.com"};
             sendSmtpEmail.to = [{"email": `${email}`}];
 
