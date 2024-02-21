@@ -1,4 +1,4 @@
-const baseURL = 'http://13.239.43.152/api';
+const baseURL = 'http://13.239.43.1520/api';
 
 function validate () {
     const amount = document.getElementById('amount').value;
@@ -421,9 +421,19 @@ document.getElementById('rzp-button1').addEventListener('click', async(e) => {
         rzp1.open();
         e.preventDefault();
 
-        rzp1.on('payment.failed', function (response) {
-            console.log(response);
-            alert('Something went wrong');
+        rzp1.on('payment.failed', async function (response) {
+            try {
+                await axios.post(`${baseURL}/user/updatetransactionstatus`, {
+                    order_id: options.order_id,
+                    payment_id: null,
+                }, { headers: { "Authorization": token } });
+            } catch (err) {
+                console.error(err);
+                alert('Failed to update transaction status.');
+            }
+
+            // Display a message to the user indicating payment failure
+            alert('Payment failed. Please try again.');
         });
     } catch(err) {
         console.log(err);

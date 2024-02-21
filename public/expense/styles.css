@@ -434,6 +434,11 @@ button.page-number.active {
         max-height: 90%;
         margin: 0;
     }
+    .table-leader-body{
+        width: 100%;
+        max-height: 90%;
+        margin: 0;
+    }
     .download-report{
         padding: 0.5rem;
     }

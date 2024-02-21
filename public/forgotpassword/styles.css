@@ -14,7 +14,7 @@
     position: relative;
 }
 
-#email-successful, #otp-successful {
+#email-successful {
     display: none;
     background-color: rgb(41, 175, 41);
     height: 30px;

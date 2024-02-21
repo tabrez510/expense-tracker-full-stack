@@ -1,4 +1,4 @@
-const baseURL = 'http://13.239.43.152/api';
+const baseURL = 'http://13.239.43.1520/api';
 const signupBtn = document.getElementById('signupBtn');
 const form = document.querySelector('form');
 
@@ -134,13 +134,16 @@ form.addEventListener('submit', async(event) => {
             document.getElementById('email').value = '';
             document.getElementById('password').value = '';
 
-            document.getElementById('signup-successful').style.display = 'block'
+            document.getElementById('signup-successful').style.display = 'block';
+            localStorage.setItem('token', user.data.token);
 
             invalidLength.style.display = 'none';
             invalidUpper.style.display = 'none';
             invalidLower.style.display = 'none';
             invalidNumeric.style.display = 'none';
             invalidSpecial.style.display = 'none';
+
+            window.location.href = '../expense/index.html';
         } catch(err){
             console.log(err);
             alert(err.message);

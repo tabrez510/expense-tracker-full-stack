@@ -13,7 +13,7 @@ const createUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await User.create({name, email, password: hashedPassword});
-        res.json({success: true, exists: false, ...user.dataValues});
+        res.json({success: true, exists: false, ...user.dataValues, token: generatedWebToken(user.id, user.name, false) });
     } catch(err) {
         console.log(err);
         res.status(500).json({success: false, err: err, message: 'Internal Server Error'});

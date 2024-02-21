@@ -9,12 +9,18 @@ form.addEventListener('submit', async (e) => {
     }
 
     try{
-        const response =await axios.post('http://13.239.43.152/api/password/forgotpassword', userDetails);
-        if(response.status == 202){
-            alert('password changed');
+        const response =await axios.post('http://13.239.43.1520/api/password/forgotpassword', userDetails);
+        if(response.status === 200){
+            document.getElementById('user-not-found').style.display = 'none';
+            document.getElementById('email-successful').style.display = 'block';
+            document.getElementById('email').value = '';
         }
     } catch(err) {
-        console.log(err);
-        alert(err.message);
+        if(err.request.status === 404){
+            document.getElementById('user-not-found').style.display = 'block';
+        } else {
+            console.log(err);
+            alert(err.message);
+        }
     }
 })

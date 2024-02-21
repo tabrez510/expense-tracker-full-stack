@@ -8,7 +8,7 @@ const purchasepremium = async (req, res) => {
             key_id: process.env.RAZORPAY_KEY_ID,
             key_secret: process.env.RAZORPAY_KEY_SECRET
         })
-        const amount = 500;
+        const amount = 5000;
 
         rzp.orders.create({amount, currency: "INR"}, async(err, order) => {
             if(err) {
@@ -42,16 +42,17 @@ const updateTransactionStatus = async(req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        const orderUpdatePromise = order.update({paymentId: payment_id, status: 'SUCCESSFUL'});
-        const userUpdatePromise = req.user.update({isPremiumUser: true});
-        Promise.all([orderUpdatePromise, userUpdatePromise])
-            .then(() => {
-                return res.status(202).json({ success: true, message: 'Transaction Successful', token: userControllers.generatedWebToken(userId, name, true) });
-            })
-            .catch(async(err) => {
-                console.error(err);
-                return res.status(500).json({ success: false, message: 'Failed to update transaction status' });
-            })
+        if (payment_id) {
+            await Promise.all([
+                order.update({ paymentId: payment_id, status: 'SUCCESSFUL' }),
+                req.user.update({ isPremiumUser: true })
+            ]);
+
+            return res.status(202).json({ success: true, message: 'Transaction Successful', token: userControllers.generatedWebToken(userId, name, true) });
+        } else {
+            await order.update({ status: 'FAILED' });
+            return res.status(400).json({ success: false, message: 'Transaction Failed' });
+        }
 
 
     } catch(err){

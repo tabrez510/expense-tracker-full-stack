@@ -24,7 +24,7 @@ const forgotpassword = async (req, res) => {
             let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); 
             sendSmtpEmail.subject = "Forgot Password";
             sendSmtpEmail.textContent = "Visit this link to reset your password";
-            sendSmtpEmail.htmlContent = `<a href="http://13.239.43.152/api/password/resetpassword/${id}">Reset password</a>`,
+            sendSmtpEmail.htmlContent = `<a href="http://13.239.43.1520/api/password/resetpassword/${id}">Reset password</a>`,
             sendSmtpEmail.sender = {"name": "Md Tabrez Alam", "email": "alamtabrez510@gmail.com"};
             sendSmtpEmail.to = [{"email": `${email}`}];
 
@@ -32,15 +32,14 @@ const forgotpassword = async (req, res) => {
             try{
                 const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
                 console.log(JSON.stringify(data));
+                res.status(200).json({ success: true, message: "Password reset email sent successfully" });
             } catch(err) {
                 console.error("Error sending password reset email:", err);
                 res.status(500).json({ success: false, message: "Failed to send password reset email" });
             }
 
-            // Send success response
-            res.status(200).json({ success: true, message: "Password reset email sent successfully" });
         }else {
-            throw new Error('User doesnt exist')
+            res.status(404).json({success: false, message: 'Email does not exist'});
         }
     } catch(err){
         console.error(err)
@@ -83,7 +82,6 @@ const updatepassword = async(req, res) => {
         const user = await User.findOne({where: { id : resetpasswordrequest.userId}});
                 // console.log('userDetails', user)
         if(user) {
-            //encrypt the password
 
             const saltRounds = 10;
             bcrypt.genSalt(saltRounds, function(err, salt) {
@@ -92,7 +90,6 @@ const updatepassword = async(req, res) => {
                     throw new Error(err);
                 }
                 bcrypt.hash(newpassword, salt, async function(err, hash) {
-                    // Store hash in your password DB.
                     if(err){
                         console.log(err);
                         throw new Error(err);

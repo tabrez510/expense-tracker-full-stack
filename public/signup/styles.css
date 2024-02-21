@@ -182,3 +182,13 @@ form p a {
     background-color: #eaeaea;
     color: #555;
 }
+
+@media (max-width: 575.98px) {
+    .navbar{
+        width: 100vw;
+        margin: 0.5rem 0;
+    }
+    .login-signup li {
+        margin-left: 0rem;
+    }
+}
