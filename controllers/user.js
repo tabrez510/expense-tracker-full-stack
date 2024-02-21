@@ -12,7 +12,7 @@ const createUser = async (req, res) => {
         const {name, email, password} = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await User.create({name, email, password: hashedPassword});
+        const user = await User.create({name, email, isPremiumUser: false, password: hashedPassword});
         res.json({success: true, exists: false, ...user.dataValues, token: generatedWebToken(user.id, user.name, false) });
     } catch(err) {
         console.log(err);
