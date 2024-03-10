@@ -1,4 +1,4 @@
-const baseURL = 'http://13.239.43.152/api';
+const baseURL = 'http://localhost:3000/api';
 const signupBtn = document.getElementById('signupBtn');
 const form = document.querySelector('form');
 
